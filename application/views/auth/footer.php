@@ -10,7 +10,7 @@
 <script src="<?= base_url('assets') ?>/sweetalert/sweetalert2.all.min.js"></script>
 <!-- My JS -->
 <script src="<?= base_url('assets') ?>/js/auth.js"></script>
-
+<script></script>
 </body>
 
 </html>
