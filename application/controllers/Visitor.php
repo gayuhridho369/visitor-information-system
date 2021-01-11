@@ -8,6 +8,8 @@ class Visitor extends CI_Controller
         parent::__construct();
 
         $this->load->model('m_visitor');
+
+        // Check status visitor
         $status = $this->session->userdata('status');
         if ($status == 'in') {
             $phone = $this->session->userdata('phone');
@@ -20,11 +22,9 @@ class Visitor extends CI_Controller
         }
     }
 
+    // Method for status visitor (checkin/checkout/verify)
     public function index()
     {
-        // $this->session->sess_destroy();
-        // var_dump($_SESSION);
-        // die;
         $public_space_id = $this->session->userdata('public_space_id');
         $data['public_space'] = $this->m_visitor->get_user('public_space', 'id', $public_space_id);
         $data['phone'] = $this->session->userdata('phone');
@@ -40,12 +40,15 @@ class Visitor extends CI_Controller
         }
     }
 
+    // Method for visitors to enter the public space by scanning the QR code
     public function check_in($id)
     {
         $data['public_space'] = $this->m_visitor->get_user('public_space', 'id', $id);
 
+        // If the public space is registered
         if ($data['public_space']) {
 
+            // If the visitor is out of status and the browser still stores the phone number in the session
             if ($this->session->userdata('status') == 'out') {
 
                 $this->session->set_userdata('public_space_id', $data['public_space']['id']);
@@ -62,10 +65,12 @@ class Visitor extends CI_Controller
                 redirect('visitor');
             } elseif ($this->session->userdata('status') == 'in') {
 
+                // Visitor status is inside, so they can't checkin
                 $this->session->set_flashdata('message', 'is-checkin');
                 redirect('visitor');
             } else {
 
+                // Visitors enter by scanning the QR code, and the system will show form to input ponsel number
                 $this->session->set_userdata('public_space_id', $data['public_space']['id']);
                 $this->form_validation->set_rules('phone', 'Phone Number', 'required|numeric|min_length[11]');
 
@@ -76,13 +81,17 @@ class Visitor extends CI_Controller
                     $this->load->view('visitor/footer');
                 } else {
 
+                    // After the visitor enters the cellphone number
                     $phone = $this->input->post('phone');
                     $is_checkin = $this->m_visitor->is_checkin($phone);
 
+                    // When a visitor is checked in, the system will refuse to check in
                     if ($is_checkin) {
                         $this->session->set_flashdata('message', 'is-checkin');
                         redirect('visitor/check_in/' . $id . '');
                     } else {
+
+                        // The system will send a verification link via SMS
                         $token = uniqid();
                         $data = [
                             'phone' => $phone,
@@ -98,6 +107,7 @@ class Visitor extends CI_Controller
 
                         $result = $this->_otp_sender($phone, $token);
 
+                        // Respone 1 if the SMS succedd, and other if the SMS failed
                         if ($result[0]['status'] == 1) {
                             $this->session->set_flashdata('message', 'sms-success');
                             $this->session->set_userdata('phone', $phone);
@@ -116,12 +126,12 @@ class Visitor extends CI_Controller
         }
     }
 
+    // SMS Sender with gateway from medansms.com
     private function _otp_sender($phone, $token)
     {
         $email_api    = urlencode("gayuhridho369@gmail.com");
         $passkey_api  = urlencode("Hm123123");
         $phone_ = urlencode($phone);
-        // $message = urlencode("Hai" . $phone . $token);
         $message = urlencode("Click this link to verify your account : " . base_url() . "visitor/verify?phone=" . $phone . "&token=" . $token . " ");
 
         $url          = "https://reguler.medansms.co.id/sms_api.php?action=kirim_sms&email=" . $email_api . "&passkey=" . $passkey_api . "&no_tujuan=" . $phone_ . "&pesan=" . $message . "&json=1";
@@ -130,6 +140,7 @@ class Visitor extends CI_Controller
         return $resultArr;
     }
 
+    // Sending with curl
     private function _send_api($url)
     {
         $ch = curl_init();
@@ -143,6 +154,7 @@ class Visitor extends CI_Controller
         return $response;
     }
 
+    // Verification link is true or false
     public function verify()
     {
         $phone = $this->input->get('phone');
@@ -179,6 +191,7 @@ class Visitor extends CI_Controller
         }
     }
 
+    // Method for visitors to checkout by scanning the QR code at the exit
     public function check_out($id)
     {
         $data['public_space'] = $this->m_visitor->get_user('public_space', 'id', $id);

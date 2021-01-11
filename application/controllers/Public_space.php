@@ -13,6 +13,7 @@ class Public_space extends CI_Controller
         $this->load->model('m_public_space');
     }
 
+    // Method index for showing dahboard
     public function index()
     {
         $user = $this->session->userdata('email');
@@ -30,6 +31,7 @@ class Public_space extends CI_Controller
         $this->load->view('public_space/footer');
     }
 
+    // Send json data to chart.js
     public function chartdata()
     {
         $email = $this->session->userdata('email');
@@ -43,6 +45,7 @@ class Public_space extends CI_Controller
         echo json_encode(array_values($data));
     }
 
+    // Method for visitor information who has entered
     public function visitor_inside()
     {
         $user = $this->session->userdata('email');
@@ -56,6 +59,7 @@ class Public_space extends CI_Controller
         $this->load->view('public_space/footer');
     }
 
+    // Admin of public space can chekkout visitor
     public function check_out($id)
     {
         $this->m_public_space->check_out($id);
@@ -63,6 +67,7 @@ class Public_space extends CI_Controller
         echo json_encode(["status" => TRUE]);
     }
 
+    // Method for information from the history of all visitors
     public function visitor_history()
     {
         $user = $this->session->userdata('email');
@@ -70,8 +75,6 @@ class Public_space extends CI_Controller
 
         if ($this->input->get('date')) {
             $date = explode("-", $this->input->get('date'));
-            // var_dump($date);
-            // die;
             $date1 =  str_replace('/', '-', $date[0]);
             $date1 = date("Y-m-d H:i:s", strtotime($date1));
             $date2 = str_replace('/', '-', $date[1]);
@@ -90,6 +93,7 @@ class Public_space extends CI_Controller
         $this->load->view('public_space/footer');
     }
 
+    // Setting the account public space
     public function account()
     {
         $user = $this->session->userdata('email');
@@ -154,6 +158,7 @@ class Public_space extends CI_Controller
         }
     }
 
+    // Validation when the password will be change
     public function password_verify($password)
     {
         $user = $this->session->userdata('email');
@@ -169,6 +174,7 @@ class Public_space extends CI_Controller
         }
     }
 
+    // Method for print QR-Code (checkin/checkout) via PDF
     public function print_qrcode()
     {
         $this->load->library('Efpdf');
@@ -206,6 +212,7 @@ class Public_space extends CI_Controller
         $pdf->Output();
     }
 
+    // Gerate the QR-Code with library of CIQRCODE
     private function _qrcode_generator($qrcode, $name)
     {
         $this->load->library('ciqrcode');
@@ -217,6 +224,7 @@ class Public_space extends CI_Controller
         $this->ciqrcode->generate($params);
     }
 
+    // Method for logout from system
     public function logout()
     {
         $this->session->unset_userdata('email');

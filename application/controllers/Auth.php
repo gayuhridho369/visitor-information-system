@@ -13,6 +13,7 @@ class Auth extends CI_Controller
         $this->load->model('m_auth');
     }
 
+    // Method for the login of public space
     public function index()
     {
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
@@ -49,6 +50,7 @@ class Auth extends CI_Controller
         }
     }
 
+    // Method for registration of public space
     public function registration()
     {
         $this->form_validation->set_rules('name', 'Name', 'required|min_length[3]');
@@ -87,6 +89,7 @@ class Auth extends CI_Controller
         }
     }
 
+    // Sending link verification to email after registration
     private function _send_email($token)
     {
         $config = [
@@ -115,6 +118,7 @@ class Auth extends CI_Controller
         }
     }
 
+    // Verification link to create an active account 
     public function verify()
     {
         $email = $this->input->get('email');
@@ -145,15 +149,4 @@ class Auth extends CI_Controller
             redirect('auth');
         }
     }
-
-    // private function _qrcode_generator($qrcode, $name)
-    // {
-    //     $this->load->library('ciqrcode');
-
-    //     $params['data'] = $qrcode;
-    //     $params['level'] = 'H';
-    //     $params['size'] = 10;
-    //     $params['savename'] = FCPATH . './assets/qrcode/' . $name . '.png';
-    //     $this->ciqrcode->generate($params);
-    // }
 }
