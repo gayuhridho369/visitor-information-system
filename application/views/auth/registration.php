@@ -5,7 +5,7 @@
 
     <div class="card">
         <div class="card-body register-card-body">
-            <p class="login-box-msg">Movement and Tracking System</p>
+            <p class="login-box-msg">Visitor Information System</p>
 
             <form action="" method="post" class="needs-validation">
                 <div class="input-group mb-2">
